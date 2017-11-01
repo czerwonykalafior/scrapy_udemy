@@ -1,5 +1,7 @@
 from scrapy import Spider
 from scrapy.loader import ItemLoader
+from scrapy.http import FormRequest
+from scrapy.utils.response import open_in_browser
 
 from quotes_spider.items import QuotesSpiderItem
 
@@ -7,9 +9,19 @@ from quotes_spider.items import QuotesSpiderItem
 
 class Udemy_1_Spider(Spider):
     name = 'udemy_1_quotes'
-    start_urls = ['http://quotes.toscrape.com/']
+    start_urls = ['http://quotes.toscrape.com/login']
 
     def parse(self, response):
+        token = response.xpath('//*[@name="csrf_token"]/@value').extract_first()
+        return FormRequest.from_response(response,
+                                         formdata={
+                                                'csrf_token': token,
+                                                'password': 'foo',
+                                                'username': 'bar'},
+                                        callback=self.scrape_home_papge)
+
+    def scrape_home_papge(self, response):
+        open_in_browser(response)
         l = ItemLoader(item=QuotesSpiderItem(), response=response)
 
         h1_tag = response.xpath('//h1/a/text()').extract_first()
