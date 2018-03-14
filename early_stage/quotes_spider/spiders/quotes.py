@@ -19,7 +19,7 @@ class Udemy_1_Spider(Spider):
                                                 'password': 'foo',
                                                 'username': 'bar'},
                                         callback=self.scrape_home_papge)
-
+    print ('test')
     def scrape_home_papge(self, response):
         open_in_browser(response)
         l = ItemLoader(item=QuotesSpiderItem(), response=response)
